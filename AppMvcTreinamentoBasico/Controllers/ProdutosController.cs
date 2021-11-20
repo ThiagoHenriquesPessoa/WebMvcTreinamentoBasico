@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using AppMvcTreinamentoBasico.Data;
 using AppMvcTreinamentoBasico.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AppMvcTreinamentoBasico.Controllers
 {
+    [Authorize]
     public class ProdutosController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -19,6 +21,7 @@ namespace AppMvcTreinamentoBasico.Controllers
             _context = context;
         }
 
+        [AllowAnonymous]
         // GET: Produtos
         public async Task<IActionResult> Index()
         {
@@ -26,6 +29,7 @@ namespace AppMvcTreinamentoBasico.Controllers
             return View(await applicationDbContext.ToListAsync());
         }
 
+        [AllowAnonymous]
         // GET: Produtos/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
@@ -48,7 +52,7 @@ namespace AppMvcTreinamentoBasico.Controllers
         // GET: Produtos/Create
         public IActionResult Create()
         {
-            ViewData["FornecedorId"] = new SelectList(_context.Fornecedores, "Id", "Documento");
+            ViewData["FornecedorId"] = new SelectList(_context.Fornecedores, "Id", "Nome");
             return View();
         }
 
@@ -57,16 +61,15 @@ namespace AppMvcTreinamentoBasico.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("FornecedorId,Nome,Descricao,Imagem,Valor,DataCadastro,Ativo,Id")] Produto produto)
+        public async Task<IActionResult> Create(Produto produto)
         {
             if (ModelState.IsValid)
             {
-                produto.Id = Guid.NewGuid();
                 _context.Add(produto);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["FornecedorId"] = new SelectList(_context.Fornecedores, "Id", "Documento", produto.FornecedorId);
+            ViewData["FornecedorId"] = new SelectList(_context.Fornecedores, "Id", "Nome", produto.FornecedorId);
             return View(produto);
         }
 
@@ -83,7 +86,7 @@ namespace AppMvcTreinamentoBasico.Controllers
             {
                 return NotFound();
             }
-            ViewData["FornecedorId"] = new SelectList(_context.Fornecedores, "Id", "Documento", produto.FornecedorId);
+            ViewData["FornecedorId"] = new SelectList(_context.Fornecedores, "Id", "Nome", produto.FornecedorId);
             return View(produto);
         }
 
@@ -92,7 +95,7 @@ namespace AppMvcTreinamentoBasico.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("FornecedorId,Nome,Descricao,Imagem,Valor,DataCadastro,Ativo,Id")] Produto produto)
+        public async Task<IActionResult> Edit(Guid id, Produto produto)
         {
             if (id != produto.Id)
             {
@@ -119,7 +122,7 @@ namespace AppMvcTreinamentoBasico.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["FornecedorId"] = new SelectList(_context.Fornecedores, "Id", "Documento", produto.FornecedorId);
+            ViewData["FornecedorId"] = new SelectList(_context.Fornecedores, "Id", "Nome", produto.FornecedorId);
             return View(produto);
         }
 
