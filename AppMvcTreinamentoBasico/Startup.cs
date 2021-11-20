@@ -1,4 +1,4 @@
-using AppMvcTreinamentoBasico.Data;
+﻿using AppMvcTreinamentoBasico.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -35,6 +35,8 @@ namespace AppMvcTreinamentoBasico
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddControllersWithViews();
+
+           
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
