@@ -10,22 +10,23 @@ using AppMvcTreinamentoBasico.Models;
 
 namespace AppMvcTreinamentoBasico.Controllers
 {
-    public class FornecedoresController : Controller
+    public class EnderecosController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public FornecedoresController(ApplicationDbContext context)
+        public EnderecosController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: Fornecedores
+        // GET: Enderecos
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Fornecedores.ToListAsync());
+            var applicationDbContext = _context.Enderecos.Include(e => e.Fornecedor);
+            return View(await applicationDbContext.ToListAsync());
         }
 
-        // GET: Fornecedores/Details/5
+        // GET: Enderecos/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
             if (id == null)
@@ -33,40 +34,43 @@ namespace AppMvcTreinamentoBasico.Controllers
                 return NotFound();
             }
 
-            var fornecedor = await _context.Fornecedores
+            var endereco = await _context.Enderecos
+                .Include(e => e.Fornecedor)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (fornecedor == null)
+            if (endereco == null)
             {
                 return NotFound();
             }
 
-            return View(fornecedor);
+            return View(endereco);
         }
 
-        // GET: Fornecedores/Create
+        // GET: Enderecos/Create
         public IActionResult Create()
         {
+            ViewData["FornecedorId"] = new SelectList(_context.Fornecedores, "Id", "Documento");
             return View();
         }
 
-        // POST: Fornecedores/Create
+        // POST: Enderecos/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Fornecedor fornecedor)
+        public async Task<IActionResult> Create([Bind("FornecedorId,Logradouro,Numero,Complemento,Cep,Bairro,Cidade,Estado,Id")] Endereco endereco)
         {
             if (ModelState.IsValid)
             {
-                fornecedor.Id = Guid.NewGuid();
-                _context.Add(fornecedor);
+                endereco.Id = Guid.NewGuid();
+                _context.Add(endereco);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(fornecedor);
+            ViewData["FornecedorId"] = new SelectList(_context.Fornecedores, "Id", "Documento", endereco.FornecedorId);
+            return View(endereco);
         }
 
-        // GET: Fornecedores/Edit/5
+        // GET: Enderecos/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null)
@@ -74,22 +78,23 @@ namespace AppMvcTreinamentoBasico.Controllers
                 return NotFound();
             }
 
-            var fornecedor = await _context.Fornecedores.FindAsync(id);
-            if (fornecedor == null)
+            var endereco = await _context.Enderecos.FindAsync(id);
+            if (endereco == null)
             {
                 return NotFound();
             }
-            return View(fornecedor);
+            ViewData["FornecedorId"] = new SelectList(_context.Fornecedores, "Id", "Documento", endereco.FornecedorId);
+            return View(endereco);
         }
 
-        // POST: Fornecedores/Edit/5
+        // POST: Enderecos/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, Fornecedor fornecedor)
+        public async Task<IActionResult> Edit(Guid id, [Bind("FornecedorId,Logradouro,Numero,Complemento,Cep,Bairro,Cidade,Estado,Id")] Endereco endereco)
         {
-            if (id != fornecedor.Id)
+            if (id != endereco.Id)
             {
                 return NotFound();
             }
@@ -98,12 +103,12 @@ namespace AppMvcTreinamentoBasico.Controllers
             {
                 try
                 {
-                    _context.Update(fornecedor);
+                    _context.Update(endereco);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!FornecedorExists(fornecedor.Id))
+                    if (!EnderecoExists(endereco.Id))
                     {
                         return NotFound();
                     }
@@ -114,10 +119,11 @@ namespace AppMvcTreinamentoBasico.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(fornecedor);
+            ViewData["FornecedorId"] = new SelectList(_context.Fornecedores, "Id", "Documento", endereco.FornecedorId);
+            return View(endereco);
         }
 
-        // GET: Fornecedores/Delete/5
+        // GET: Enderecos/Delete/5
         public async Task<IActionResult> Delete(Guid? id)
         {
             if (id == null)
@@ -125,30 +131,31 @@ namespace AppMvcTreinamentoBasico.Controllers
                 return NotFound();
             }
 
-            var fornecedor = await _context.Fornecedores
+            var endereco = await _context.Enderecos
+                .Include(e => e.Fornecedor)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (fornecedor == null)
+            if (endereco == null)
             {
                 return NotFound();
             }
 
-            return View(fornecedor);
+            return View(endereco);
         }
 
-        // POST: Fornecedores/Delete/5
+        // POST: Enderecos/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            var fornecedor = await _context.Fornecedores.FindAsync(id);
-            _context.Fornecedores.Remove(fornecedor);
+            var endereco = await _context.Enderecos.FindAsync(id);
+            _context.Enderecos.Remove(endereco);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool FornecedorExists(Guid id)
+        private bool EnderecoExists(Guid id)
         {
-            return _context.Fornecedores.Any(e => e.Id == id);
+            return _context.Enderecos.Any(e => e.Id == id);
         }
     }
 }
